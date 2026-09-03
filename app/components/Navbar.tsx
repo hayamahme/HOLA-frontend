@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, ShoppingBag } from "lucide-react";
+import { Menu, X, ShoppingBag } from "lucide-react";
 import InstagramIcon from "./InstagramIcon";
 import { Playfair_Display } from "next/font/google";
 import { useCart } from "../context/CartContext";
@@ -16,8 +16,8 @@ const logoFont = Playfair_Display({
 export default function Navbar() {
   const { totalItems } = useCart();
   const [mounted, setMounted] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  // التأكد من إن الـ Component تم تحميله على المتصفح لمنع خطأ الـ Hydration
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -26,16 +26,18 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-hairline bg-white/95 backdrop-blur-md">
       <div className="mx-auto grid max-w-6xl grid-cols-3 items-center px-4 py-4 sm:px-6">
         
-        {/* Left: Desktop Nav / Mobile Menu */}
+        {/* Left: Desktop Nav / Mobile Menu Toggle */}
         <div className="flex items-center gap-6">
           <button
             type="button"
-            className="text-brown md:hidden hover:opacity-70"
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-brown md:hidden hover:opacity-70 focus:outline-none"
             aria-label="Open menu"
           >
-            <Menu size={20} />
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
+          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold uppercase tracking-widest text-brown">
             <Link href="/" className="transition-opacity hover:opacity-60">
               Home
@@ -79,7 +81,6 @@ export default function Navbar() {
             className="relative transition-opacity hover:opacity-60"
           >
             <ShoppingBag size={20} />
-            {/* العرض فقط بعد الـ Mounting لمنع الـ Hydration Error */}
             {mounted && totalItems > 0 && (
               <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-brown text-[10px] font-bold text-white">
                 {totalItems}
@@ -89,6 +90,40 @@ export default function Navbar() {
         </div>
 
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      {isOpen && (
+        <nav className="md:hidden border-t border-hairline bg-white px-6 py-4 flex flex-col gap-4 text-xs font-semibold uppercase tracking-widest text-brown">
+          <Link 
+            href="/" 
+            onClick={() => setIsOpen(false)}
+            className="transition-opacity hover:opacity-60"
+          >
+            Home
+          </Link>
+          <Link 
+            href="/shop" 
+            onClick={() => setIsOpen(false)}
+            className="transition-opacity hover:opacity-60"
+          >
+            Shop
+          </Link>
+          <Link 
+            href="/about" 
+            onClick={() => setIsOpen(false)}
+            className="transition-opacity hover:opacity-60"
+          >
+            About
+          </Link>
+          <Link 
+            href="/policy" 
+            onClick={() => setIsOpen(false)}
+            className="transition-opacity hover:opacity-60"
+          >
+            Contact
+          </Link>
+        </nav>
+      )}
     </header>
   );
 }
